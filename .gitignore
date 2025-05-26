@@ -77,6 +77,10 @@ DEVELOPMENT_PLAN.md
 my-custom-rule.mdc
 GITHUB_RELEASE_CHECKLIST.md
 PRIVATE_FILES_MANAGEMENT.md
+PRIVATE_SUBMODULE_SETUP.md
+PRIVATE_WORKFLOW.md
+backup-private.sh
+restore-private.sh
 .env
 .env.local
 
