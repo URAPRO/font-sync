@@ -7,6 +7,8 @@ macOS専用のCLIフォント同期ツール。Dropboxなどの共有フォル�
 ![Python](https://img.shields.io/badge/python-3.8+-blue.svg)
 ![License](https://img.shields.io/badge/license-MIT-green.svg)
 
+> **Note**: このプロジェクトは[Cursor](https://cursor.sh/)とのCo-Writingで開発されています 🤝
+
 ## こんな方におすすめ 👥
 
 - **デザイナー・クリエイター**: 自宅と会社のMacで同じフォント環境を維持したい
@@ -42,7 +44,7 @@ font-sync sync
 ### 方法1: Homebrewを使用（推奨・準備中）
 
 ```bash
-brew tap yourusername/font-sync
+brew tap URAPRO/font-sync
 brew install font-sync
 ```
 
@@ -60,7 +62,7 @@ pip3 install font-sync
 
 ```bash
 # リポジトリをクローン
-git clone https://github.com/yourusername/font-sync.git
+git clone https://github.com/URAPRO/font-sync.git
 cd font-sync
 
 # 仮想環境を作成（推奨）
@@ -297,15 +299,16 @@ pytest tests/test_font_manager.py -v
 
 ## 作者 ✍️
 
-Your Name ([@yourusername](https://twitter.com/yourusername))
+**URAPRO**
+- GitHub: [@URAPRO](https://github.com/URAPRO)
+- X (Twitter): [@tk_adio](https://twitter.com/tk_adio)
 
 ## サポート 💖
 
 もしfont-syncが役に立ったら：
 - ⭐ このリポジトリにスターをつける
-- 🐛 バグを見つけたら[Issue](https://github.com/yourusername/font-sync/issues)を作成
-- 💡 アイデアがあれば[Discussion](https://github.com/yourusername/font-sync/discussions)で共有
-- ☕ [Buy me a coffee](https://www.buymeacoffee.com/yourusername)でサポート
+- 🐛 バグを見つけたら[Issue](https://github.com/URAPRO/font-sync/issues)を作成
+- 💡 アイデアがあれば[Discussion](https://github.com/URAPRO/font-sync/discussions)で共有
 
 ---
 
