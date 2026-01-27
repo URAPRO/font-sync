@@ -1,6 +1,6 @@
-# font-sync 🔤
+# font-sync
 
-macOS専用のCLIフォント同期ツール。Dropboxなどの共有フォルダを介して、複数のMac間でフォントを簡単に同期できます。
+A CLI font synchronization tool for macOS. Easily sync fonts across multiple Macs via cloud storage like Dropbox, iCloud Drive, or Google Drive.
 
 [![CI](https://github.com/URAPRO/font-sync/actions/workflows/ci.yml/badge.svg)](https://github.com/URAPRO/font-sync/actions/workflows/ci.yml)
 [![PyPI version](https://img.shields.io/pypi/v/font-sync.svg)](https://pypi.org/project/font-sync/)
@@ -8,311 +8,161 @@ macOS専用のCLIフォント同期ツール。Dropboxなどの共有フォル�
 [![macOS](https://img.shields.io/badge/macOS-10.14+-blue.svg)](https://github.com/URAPRO/font-sync)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 
-> **Note**: このプロジェクトは[Cursor](https://cursor.sh/)とのCo-Writingで開発されています 🤝
+**[日本語版 README はこちら](README_ja.md)**
 
-## こんな方におすすめ 👥
+## Features
 
-- **デザイナー・クリエイター**: 自宅と会社のMacで同じフォント環境を維持したい
-- **開発者**: フォント管理を自動化してセットアップ時間を短縮したい
-- **チーム**: プロジェクトで使用するフォントをメンバー間で共有したい
+- **Smart Differential Sync** – Only syncs changed fonts for fast operation
+- **Cloud Storage Support** – Works with Dropbox, iCloud Drive, Google Drive, OneDrive
+- **Parallel Processing** – Handles 1000+ fonts efficiently
+- **Beautiful CLI** – Rich progress bars and formatted tables
+- **Safe by Default** – Dry-run mode for previewing changes
+- **Pro Format Support** – .otf and .ttf with metadata preservation
 
-## 特徴 ✨
-
-- 🚀 **簡単セットアップ**: わずか3ステップで同期環境を構築
-- 🔄 **スマートな差分同期**: 変更されたフォントのみを高速同期
-- 📊 **美しいUI**: 進捗状況が一目でわかるビジュアル表示
-- 🎯 **完全自動化**: 新規・更新・削除を自動検出して処理
-- 🛡️ **安全設計**: ドライランモードで事前確認が可能
-- 🎨 **プロ仕様**: .otf/.ttf形式に対応、メタデータ保持
-
-## クイックスタート 🚀
+## Quick Start
 
 ```bash
-# 1. インストール
-brew install font-sync  # (準備中)
+# Install
+pip install font-sync
 
-# 2. 初期設定（Dropboxフォルダを指定）
+# Initialize (specify your cloud folder)
 font-sync init --folder ~/Dropbox/Fonts/
 
-# 3. フォントを同期！
+# Sync fonts
 font-sync sync
 ```
 
-たったこれだけで、チーム全員のフォント環境が統一されます！
+## Installation
 
-## インストール方法 📦
+### Via pip (Recommended)
 
-### 方法1: Homebrewを使用（推奨・準備中）
+```bash
+pip install font-sync
+```
+
+### Via Homebrew (Coming Soon)
 
 ```bash
 brew tap URAPRO/font-sync
 brew install font-sync
 ```
 
-### 方法2: pipを使用
+### From Source
 
 ```bash
-# Python 3.8以上が必要です
-python3 --version
-
-# font-syncをインストール
-pip3 install font-sync
-```
-
-### 方法3: ソースからインストール（開発者向け）
-
-```bash
-# リポジトリをクローン
 git clone https://github.com/URAPRO/font-sync.git
 cd font-sync
-
-# 仮想環境を作成（推奨）
-python3 -m venv venv
-source venv/bin/activate
-
-# 依存関係をインストール
-pip install -r requirements.txt
-
-# font-syncをインストール
-pip install -e .
+pip install -e ".[dev]"
 ```
 
-## 詳しい使い方 📖
+## Usage
 
-### 初期設定
+### Initialize
 
 ```bash
-$ font-sync init
-
-font-syncの初期設定を開始します。
-
-同期元フォルダのパスを入力してください。
-例: ~/Dropbox/shared-fonts/
-同期元フォルダのパス [~/Dropbox/shared-fonts/]: ~/Dropbox/MyFonts/
-
-✓ 設定を保存しました。
-設定ファイル: ~/.fontsync/config.json
-同期元フォルダ: ~/Dropbox/MyFonts/
-
-ℹ 23個のフォントファイルが見つかりました。
-'font-sync sync' コマンドでフォントを同期できます。
+font-sync init
 ```
 
-### フォントの同期
+Interactively set up your sync source folder (cloud storage directory).
+
+### Sync Fonts
 
 ```bash
-$ font-sync sync
-
-同期元フォルダ: ~/Dropbox/MyFonts/
-
-ℹ 23個のフォントファイルが見つかりました。
-
-  差分を確認中... ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100%
-           同期対象のフォント            
-┏━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━┓
-┃ 状態         ┃ フォント名    ┃ サイズ  ┃
-┡━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━╇━━━━━━━━━━┩
-│ 新規         │ Noto Sans.otf │ 4.2 MB  │
-│ 新規         │ Roboto.ttf    │ 2.1 MB  │
-│ 更新         │ Helvetica.otf │ 3.5 MB  │
-└──────────────┴───────────────┴──────────┘
-
-3個のフォントを同期します。
-
-  インストール中: Helvetica.otf ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100%
-
-✓ 3個のフォントを正常に同期しました。
-
-同期完了: 2024-01-20 15:30:45
+font-sync sync
 ```
 
-### フォント一覧の確認
+Syncs new and updated fonts from the source folder to your system.
+
+### List Fonts
 
 ```bash
-$ font-sync list
-
-フォント一覧 - ~/Dropbox/MyFonts/
-┏━━━━━━┳━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━┓
-┃ 状態 ┃ フォント名        ┃ サイズ  ┃ 更新日時          ┃ メモ                  ┃
-┡━━━━━━╇━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━┩
-│ ✓    │ Helvetica.otf     │ 3.5 MB  │ 2024-01-20 15:30  │ インストール: 2024-01-20 │
-│ ✓    │ Noto Sans.otf     │ 4.2 MB  │ 2024-01-15 10:20  │ インストール: 2024-01-20 │
-│ ✓    │ Roboto.ttf        │ 2.1 MB  │ 2024-01-10 09:15  │ インストール: 2024-01-20 │
-│ ✗    │ Arial Unicode.ttf │ 23.5 MB │ 2024-01-20 14:00  │ -                     │
-└──────┴───────────────────┴─────────┴────────────────────┴────────────────────────┘
-
-合計: 4個のフォント
-  ✓ インストール済み: 3個
-  ✗ 未インストール: 1個
+font-sync list
 ```
 
-### 既存フォントのインポート
+Shows all fonts in the source folder with their sync status.
 
-ダウンロードしたフォントや既存のフォントコレクションを同期元に追加：
+### Import Fonts
 
 ```bash
-# 単一のフォントファイル
-$ font-sync import ~/Downloads/MyNewFont.otf
-
-1個のフォントが見つかりました:
-  • MyNewFont.otf
-
-同期元フォルダにコピーします: ~/Dropbox/MyFonts/
-コピーを実行しますか？ [y/n]: y
-
-  フォントをコピー中... ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100%
-
-✓ 1個のフォントをコピーしました。
-
-ヒント: 'font-sync sync' で新しいフォントを他のMacに同期できます。
-
-# フォルダごとインポート
-$ font-sync import ~/Desktop/FontCollection/ --move
+font-sync import ~/Downloads/MyFont.otf
+font-sync import ~/Desktop/FontCollection/ --move
 ```
 
-### 不要なフォントのクリーンアップ
+Add existing fonts to your sync source folder.
 
-同期元から削除されたフォントをシステムからも削除：
+### Clean Up
 
 ```bash
-# まず確認（ドライラン）
-$ font-sync clean
-
-             削除対象のフォント（2個）              
-┏━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━┓
-┃ フォント名        ┃ 理由               ┃ インストール日 ┃
-┡━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━┩
-│ OldFont.otf       │ 同期元から削除済み │ 2023-12-01     │
-│ Unused.ttf        │ 同期元から削除済み │ 2023-11-15     │
-└───────────────────┴────────────────────┴────────────────┘
-
-これはドライランモードです。実際の削除は行われません。
-実際に削除するには '--execute' オプションを使用してください。
-
-# 実際に削除
-$ font-sync clean --execute
+font-sync clean           # Dry-run (preview)
+font-sync clean --execute # Actually remove
 ```
 
-## よくある質問（FAQ）❓
+Remove fonts that were deleted from the source folder.
 
-### Q: WindowsやLinuxでも使えますか？
-A: 申し訳ございません。font-syncは現在macOS専用です。フォントの保存場所やシステムの仕組みが異なるため、他のOSには対応していません。
+## Commands
 
-### Q: iCloud Driveでも使えますか？
-A: はい！Dropbox以外にも、iCloud Drive、Google Drive、OneDriveなど、ローカルフォルダとして同期されるクラウドストレージであれば使用できます。
+| Command | Description |
+|---------|-------------|
+| `init` | Set up sync source folder |
+| `sync` | Sync fonts from source to system |
+| `list` | List fonts and their status |
+| `import` | Add fonts to source folder |
+| `clean` | Remove orphaned fonts |
 
-### Q: フォントが多すぎて同期に時間がかかります
-A: font-syncは差分同期を行うため、2回目以降の同期は高速です。初回のみ、すべてのフォントをインストールする必要があります。
+## Roadmap
 
-### Q: 会社のセキュリティポリシーでCLIツールの使用が制限されています
-A: 今後リリース予定のGUI版（有料）をご検討ください。より安全で使いやすいインターフェースを提供予定です。
+- [x] v1.0 – Core sync functionality
+- [x] v1.0 – Parallel processing & caching (1000+ fonts)
+- [ ] GUI app (macOS menu bar) – *Coming soon*
+- [ ] Homebrew formula
 
-### Q: フォントのライセンスは大丈夫ですか？
-A: font-syncはフォントファイルをコピーするツールです。フォントのライセンスについては、各フォントのライセンス条項をご確認ください。
+## FAQ
 
-## トラブルシューティング 🔧
+**Q: Does it work on Windows/Linux?**
+A: No, font-sync is macOS only due to system-specific font handling.
 
-### フォントが反映されない場合
+**Q: Which cloud services are supported?**
+A: Any service that syncs to a local folder: Dropbox, iCloud Drive, Google Drive, OneDrive, etc.
 
-macOSのフォントキャッシュをクリア：
-
+**Q: How do I refresh the font cache?**
+A: Run these commands:
 ```bash
-# フォントキャッシュをクリア
 sudo atsutil databases -remove
 sudo atsutil server -shutdown
 sudo atsutil server -ping
-
-# または、セーフモードで起動（Shiftキーを押しながら起動）
 ```
 
-### 権限エラーが発生する場合
+## Development
 
 ```bash
-# フォントディレクトリの権限を確認
-ls -la ~/Library/Fonts/
+# Install dev dependencies
+pip install -e ".[dev]"
 
-# 必要に応じて権限を修正
-chmod 755 ~/Library/Fonts/
+# Run tests
+pytest
+
+# Run linter
+ruff check src/ tests/
 ```
 
-### 同期元フォルダにアクセスできない場合
+## Contributing
 
-1. クラウドストレージアプリが起動し、同期が完了しているか確認
-2. フォルダパスが正しいか確認:
-   ```bash
-   ls -la ~/Dropbox/shared-fonts/
-   ```
-3. 再設定:
-   ```bash
-   font-sync init --force
-   ```
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
 
-## 開発者向け情報 🛠️
+## License
 
-### アーキテクチャ
+MIT License. See [LICENSE](LICENSE) for details.
 
-```
-src/
-├── commands/       # 各CLIコマンドの実装
-├── config.py       # 設定管理
-└── font_manager.py # フォント操作のコアロジック
-```
-
-### テストの実行
-
-```bash
-# すべてのテストを実行
-pytest tests/
-
-# カバレッジレポート付き
-pytest --cov=src tests/
-
-# 特定のテストのみ
-pytest tests/test_font_manager.py -v
-```
-
-### 貢献方法
-
-1. このリポジトリをフォーク
-2. フィーチャーブランチを作成 (`git checkout -b feature/amazing-feature`)
-3. 変更をコミット (`git commit -m 'Add amazing feature'`)
-4. ブランチをプッシュ (`git push origin feature/amazing-feature`)
-5. プルリクエストを作成
-
-### コーディング規約
-
-- Python 3.8+ の機能を使用
-- 型ヒント（Type Hints）必須
-- docstringはGoogle形式
-- テストカバレッジ80%以上を維持
-
-## ロードマップ 🗺️
-
-- [x] v1.0 - 基本機能の実装
-- [ ] v1.1 - パフォーマンス最適化（1000フォント以上対応）
-- [ ] v1.2 - 自動同期機能（フォルダ監視）
-- [ ] v1.3 - Homebrew対応
-- [ ] v2.0 - GUI版リリース（有料）
-
-## ライセンス 📄
-
-このプロジェクトはMIT Licenseのもとで公開されています。詳細は[LICENSE](LICENSE)ファイルをご覧ください。
-
-## 作者 ✍️
+## Author
 
 **URAPRO**
 - GitHub: [@URAPRO](https://github.com/URAPRO)
 - X (Twitter): [@tk_adio](https://twitter.com/tk_adio)
 
-## サポート 💖
-
-もしfont-syncが役に立ったら：
-- ⭐ このリポジトリにスターをつける
-- 🐛 バグを見つけたら[Issue](https://github.com/URAPRO/font-sync/issues)を作成
-- 💡 アイデアがあれば[Discussion](https://github.com/URAPRO/font-sync/discussions)で共有
-
 ---
 
-**注意**: このツールはmacOS専用です。WindowsやLinuxでの動作は保証されません。
-
-<p align="center">Made with ❤️ for designers and developers on macOS</p> 
+<p align="center">Made with ❤️ for designers and developers on macOS</p>
