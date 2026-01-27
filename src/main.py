@@ -1,17 +1,16 @@
 """font-sync CLIアプリケーションのエントリーポイント"""
 
+from typing import Optional
+
 import typer
 from rich.console import Console
-from typing import Optional
-from pathlib import Path
 
 # バージョン情報をインポート
 from . import __version__
 
 # コマンドモジュールのインポート（後で追加）
 # from .commands import init, sync, list_fonts, import_fonts, clean
-
-from .utils import FontSyncError, FileLockedError, FontValidationError, NetworkSyncError
+from .utils import FontSyncError
 
 # Typerアプリケーションの作成
 app = typer.Typer(
@@ -44,7 +43,7 @@ def main(
 ) -> None:
     """
     font-sync - macOS専用のCLIフォント同期ツール
-    
+
     Dropbox等の共有フォルダを介して、複数のMac間でフォントを簡単に同期できます。
     """
     pass
@@ -66,7 +65,7 @@ def init(
 ) -> None:
     """
     font-syncの初期設定を行います。
-    
+
     同期元フォルダのパスを指定して、設定ファイルを作成します。
     """
     from .commands.init import init_command
@@ -77,7 +76,7 @@ def init(
 def sync() -> None:
     """
     同期元フォルダから新しいフォントを同期します。
-    
+
     設定された同期元フォルダをスキャンし、新規または更新されたフォントを
     ~/Library/Fonts/ にインストールします。
     """
@@ -102,7 +101,7 @@ def list_fonts(
 ) -> None:
     """
     同期元フォルダ内のフォント一覧を表示します。
-    
+
     各フォントのインストール状態、サイズ、更新日時を確認できます。
     """
     from .commands.list import list_command
@@ -124,7 +123,7 @@ def import_fonts(
 ) -> None:
     """
     既存のフォントを同期元フォルダにインポートします。
-    
+
     指定したフォントファイルまたはディレクトリ内のフォントを
     同期元フォルダにコピー（または移動）します。
     """
@@ -142,7 +141,7 @@ def clean(
 ) -> None:
     """
     同期元から削除されたフォントをシステムからも削除します。
-    
+
     同期元フォルダに存在しないが、システムにインストールされている
     フォントを検出して削除します。
     """
@@ -191,4 +190,4 @@ def handle_errors(func):
 
 
 if __name__ == "__main__":
-    app() 
+    app()

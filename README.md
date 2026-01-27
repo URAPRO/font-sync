@@ -2,10 +2,11 @@
 
 macOS専用のCLIフォント同期ツール。Dropboxなどの共有フォルダを介して、複数のMac間でフォントを簡単に同期できます。
 
-![Status](https://img.shields.io/badge/status-active-success.svg)
-![macOS](https://img.shields.io/badge/macOS-10.14+-blue.svg)
-![Python](https://img.shields.io/badge/python-3.8+-blue.svg)
-![License](https://img.shields.io/badge/license-MIT-green.svg)
+[![CI](https://github.com/URAPRO/font-sync/actions/workflows/ci.yml/badge.svg)](https://github.com/URAPRO/font-sync/actions/workflows/ci.yml)
+[![PyPI version](https://img.shields.io/pypi/v/font-sync.svg)](https://pypi.org/project/font-sync/)
+[![Python versions](https://img.shields.io/pypi/pyversions/font-sync.svg)](https://pypi.org/project/font-sync/)
+[![macOS](https://img.shields.io/badge/macOS-10.14+-blue.svg)](https://github.com/URAPRO/font-sync)
+[![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 
 > **Note**: このプロジェクトは[Cursor](https://cursor.sh/)とのCo-Writingで開発されています 🤝
 
