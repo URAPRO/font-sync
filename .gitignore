@@ -278,4 +278,9 @@ test_fonts/
 # ローカル開発用のメモ
 notes.txt
 TODO.md
-scratch/ 
+scratch/
+
+# AI development tools (managed in GUI private repo)
+.kiro/
+.claude/
+CLAUDE.md 
