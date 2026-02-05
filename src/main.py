@@ -73,7 +73,13 @@ def init(
 
 
 @app.command()
-def sync() -> None:
+def sync(
+    json_output: bool = typer.Option(
+        False,
+        "--json",
+        help="JSON形式で出力（GUI連携用）",
+    ),
+) -> None:
     """
     同期元フォルダから新しいフォントを同期します。
 
@@ -81,7 +87,7 @@ def sync() -> None:
     ~/Library/Fonts/ にインストールします。
     """
     from .commands.sync import sync_command
-    sync_command()
+    sync_command(json_output=json_output)
 
 
 @app.command(name="list")
