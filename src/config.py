@@ -6,9 +6,10 @@ font-syncの設定をJSON形式で管理します。
 
 import json
 import os
+import uuid
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, Optional
+from typing import Any, Dict, List, Optional
 
 
 class ConfigManager:
@@ -44,7 +45,26 @@ class ConfigManager:
         except json.JSONDecodeError as e:
             raise ValueError(f"設定ファイルの形式が不正です: {e}")
 
+        self._migrate_v1_to_v2()
+
         return self.config
+
+    def _migrate_v1_to_v2(self) -> None:
+        """v1 config (sync_folder) を v2 (sources[]) に自動マイグレーション"""
+        if self.config.get("schema_version", 1) >= 2:
+            return
+
+        sync_folder = self.config.get("sync_folder")
+        if sync_folder:
+            self.config["schema_version"] = 2
+            self.config["sources"] = [
+                {
+                    "id": str(uuid.uuid4()),
+                    "label": "デフォルト",
+                    "path": sync_folder,
+                    "enabled": True,
+                }
+            ]
 
     def save_config(self) -> None:
         """現在の設定をファイルに保存する
@@ -60,6 +80,76 @@ class ConfigManager:
                 json.dump(self.config, f, indent=2, ensure_ascii=False)
         except IOError as e:
             raise IOError(f"設定ファイルの保存に失敗しました: {e}")
+
+    def get_sources(self) -> List[Dict[str, Any]]:
+        """同期元ソース一覧を取得
+
+        Returns:
+            List[Dict[str, Any]]: ソースの配列
+        """
+        return self.config.get("sources", [])
+
+    def get_enabled_sources(self) -> List[Dict[str, Any]]:
+        """有効な同期元ソース一覧を取得
+
+        Returns:
+            List[Dict[str, Any]]: enabled=True のソースの配列
+        """
+        return [s for s in self.get_sources() if s.get("enabled", True)]
+
+    def add_source(self, label: str, path: str) -> Dict[str, Any]:
+        """同期元ソースを追加
+
+        Args:
+            label (str): ソースのラベル
+            path (str): ソースフォルダのパス
+
+        Returns:
+            Dict[str, Any]: 追加されたソースオブジェクト
+        """
+        if "sources" not in self.config:
+            self.config["sources"] = []
+
+        source = {
+            "id": str(uuid.uuid4()),
+            "label": label,
+            "path": os.path.expanduser(path),
+            "enabled": True,
+        }
+        self.config["sources"].append(source)
+        return source
+
+    def remove_source(self, source_id: str) -> bool:
+        """同期元ソースを削除
+
+        Args:
+            source_id (str): 削除するソースのID
+
+        Returns:
+            bool: 削除成功の場合True
+        """
+        sources = self.get_sources()
+        new_sources = [s for s in sources if s["id"] != source_id]
+        if len(new_sources) == len(sources):
+            return False
+        self.config["sources"] = new_sources
+        return True
+
+    def update_source(self, source_id: str, updates: Dict[str, Any]) -> bool:
+        """同期元ソースを更新
+
+        Args:
+            source_id (str): 更新するソースのID
+            updates (Dict[str, Any]): 更新するフィールドと値
+
+        Returns:
+            bool: 更新成功の場合True
+        """
+        for source in self.config.get("sources", []):
+            if source["id"] == source_id:
+                source.update(updates)
+                return True
+        return False
 
     def get_sync_folder(self) -> Optional[str]:
         """同期元フォルダのパスを取得

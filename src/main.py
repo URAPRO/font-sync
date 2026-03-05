@@ -79,6 +79,11 @@ def sync(
         "--json",
         help="JSON形式で出力（GUI連携用）",
     ),
+    source: Optional[str] = typer.Option(
+        None,
+        "--source",
+        help="特定ソースのIDを指定して同期（省略時は全有効ソース）",
+    ),
 ) -> None:
     """
     同期元フォルダから新しいフォントを同期します。
@@ -87,7 +92,7 @@ def sync(
     ~/Library/Fonts/ にインストールします。
     """
     from .commands.sync import sync_command
-    sync_command(json_output=json_output)
+    sync_command(json_output=json_output, source_id=source)
 
 
 @app.command(name="list")

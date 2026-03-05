@@ -72,7 +72,7 @@ class TestIntegration:
         # 2. syncコマンドの実行
         result = runner.invoke(app, ["sync"])
         assert result.exit_code == 0
-        assert "同期元フォルダ:" in result.stdout
+        assert "ソース:" in result.stdout  # multi-source形式の出力確認
         assert "正常に同期しました" in result.stdout  # "2個のフォントを正常に同期しました。"の一部をチェック
 
         # フォントがインストールされたことを確認
