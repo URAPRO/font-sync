@@ -143,6 +143,51 @@ def import_fonts(
 
 
 @app.command()
+def adopt(
+    source: Optional[str] = typer.Option(
+        None,
+        "--source",
+        help="取り込み先のソースID（省略時はソースが1つなら自動選択）",
+    ),
+    dry_run: bool = typer.Option(
+        False,
+        "--dry-run",
+        help="実際にはコピーせず、対象フォント一覧を表示のみ",
+    ),
+    json_output: bool = typer.Option(
+        False,
+        "--json",
+        help="JSON形式で出力（GUI連携用）",
+    ),
+    move: bool = typer.Option(
+        False,
+        "--move",
+        help="コピーではなく移動する（元ファイルを削除）",
+    ),
+    yes: bool = typer.Option(
+        False,
+        "--yes",
+        "-y",
+        help="--move の確認プロンプトをスキップ",
+    ),
+) -> None:
+    """
+    ~/Library/Fonts/ 内のフォントを同期元フォルダに取り込みます。
+
+    システムフォントや Adobe Fonts は自動的に除外されます。
+    同期元フォルダに既に同名ファイルがある場合はスキップされます。
+    """
+    from .commands.adopt import adopt_command
+    adopt_command(
+        source_id=source,
+        dry_run=dry_run,
+        json_output=json_output,
+        move=move,
+        yes=yes,
+    )
+
+
+@app.command()
 def clean(
     dry_run: bool = typer.Option(
         True,
