@@ -260,7 +260,7 @@ def apply_cmd(
     resolve: bool = typer.Option(
         False,
         "--resolve",
-        help="不足フォントを自動解決する（未実装、m5-f3 で実装予定）",
+        help="不足フォントを自動解決する（Google Fonts は自動 DL、Adobe Fonts/商用は案内表示）",
     ),
     dry_run: bool = typer.Option(
         False,

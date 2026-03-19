@@ -206,15 +206,18 @@ class TestApplyJsonOutput:
         # OldFont (local, not installed) = 1 unavailable
         assert summary["unavailable"] == 1
 
-    def test_apply_json_with_resolve_flag_emits_json_only(self, lock_with_mixed_fonts):
-        """--json 指定時は --resolve のプレースホルダを混ぜず JSON のみ返すこと"""
+    def test_apply_json_with_resolve_flag_includes_resolve_results(self, lock_with_mixed_fonts):
+        """--json --resolve は resolve_results フィールドを含む JSON を返すこと"""
         with patch("src.commands.apply.enumerate_installed_fonts", return_value=_MOCK_FONTS_INSTALLED):
-            result = runner.invoke(app, ["apply", "--json", "--resolve"])
+            with patch("src.commands.apply.resolve_fonts", return_value=[]) as mock_resolve:
+                result = runner.invoke(app, ["apply", "--json", "--resolve"])
 
         assert result.exit_code == 0, result.output
         data = json.loads(result.output)
         assert data["summary"]["installed"] == 2
         assert "未実装" not in result.output
+        assert "resolve_results" in data
+        mock_resolve.assert_called_once()
 
     def test_apply_json_preserves_declared_style_order(self, work_dir):
         """JSON 出力の styles が lock の宣言順を保持すること"""
@@ -378,23 +381,36 @@ class TestApplyAllInstalled:
 
 
 class TestApplyResolveFlag:
-    """--resolve フラグのプレースホルダテスト"""
+    """--resolve フラグのテスト"""
 
-    def test_apply_resolve_shows_placeholder_message(self, lock_with_mixed_fonts):
-        """--resolve フラグがプレースホルダメッセージを表示すること"""
+    def test_apply_resolve_calls_resolve_fonts(self, lock_with_mixed_fonts):
+        """--resolve フラグが resolve_fonts を呼び出すこと"""
         with patch("src.commands.apply.enumerate_installed_fonts", return_value=_MOCK_FONTS_INSTALLED):
-            result = runner.invoke(app, ["apply", "--resolve"])
+            with patch("src.commands.apply.resolve_fonts", return_value=[]) as mock_resolve:
+                result = runner.invoke(app, ["apply", "--resolve"])
 
         assert result.exit_code == 0, result.output
-        assert "未実装" in result.output or "resolve" in result.output.lower()
+        mock_resolve.assert_called_once()
+        assert "未実装" not in result.output
 
     def test_apply_resolve_still_renders_report(self, lock_with_mixed_fonts):
         """--resolve フラグでもテーブルレポートが表示されること"""
         with patch("src.commands.apply.enumerate_installed_fonts", return_value=_MOCK_FONTS_INSTALLED):
-            result = runner.invoke(app, ["apply", "--resolve"])
+            with patch("src.commands.apply.resolve_fonts", return_value=[]):
+                result = runner.invoke(app, ["apply", "--resolve"])
 
         assert result.exit_code == 0, result.output
         assert "Font Family" in result.output
+
+    def test_apply_dry_run_resolve_does_not_call_resolve_fonts(self, lock_with_mixed_fonts):
+        """--dry-run --resolve は resolve_fonts を呼び出さないこと"""
+        with patch("src.commands.apply.enumerate_installed_fonts", return_value=_MOCK_FONTS_INSTALLED):
+            with patch("src.commands.apply.resolve_fonts", return_value=[]) as mock_resolve:
+                result = runner.invoke(app, ["apply", "--dry-run", "--resolve"])
+
+        assert result.exit_code == 0, result.output
+        mock_resolve.assert_not_called()
+        assert "dry-run" in result.output
 
 
 # ---------------------------------------------------------------------------
