@@ -206,6 +206,54 @@ class TestApplyJsonOutput:
         # OldFont (local, not installed) = 1 unavailable
         assert summary["unavailable"] == 1
 
+    def test_apply_json_with_resolve_flag_emits_json_only(self, lock_with_mixed_fonts):
+        """--json 指定時は --resolve のプレースホルダを混ぜず JSON のみ返すこと"""
+        with patch("src.commands.apply.enumerate_installed_fonts", return_value=_MOCK_FONTS_INSTALLED):
+            result = runner.invoke(app, ["apply", "--json", "--resolve"])
+
+        assert result.exit_code == 0, result.output
+        data = json.loads(result.output)
+        assert data["summary"]["installed"] == 2
+        assert "未実装" not in result.output
+
+    def test_apply_json_preserves_declared_style_order(self, work_dir):
+        """JSON 出力の styles が lock の宣言順を保持すること"""
+        lock = _make_lock([
+            _make_lock_font("Inter", "google-fonts", styles=["Bold", "Regular", "Italic"]),
+        ])
+        save_lock(lock, work_dir / _LOCK_FILE_NAME)
+
+        with patch("src.commands.apply.enumerate_installed_fonts", return_value=[]):
+            result = runner.invoke(app, ["apply", "--json"])
+
+        assert result.exit_code == 0, result.output
+        data = json.loads(result.output)
+        assert data["results"][0]["styles"] == ["Bold", "Regular", "Italic"]
+
+    def test_apply_json_counts_duplicate_lock_entries_separately(self, work_dir):
+        """同一 family の重複 lock エントリも個別結果・個別集計になること"""
+        lock = _make_lock([
+            _make_lock_font("Inter", "google-fonts"),
+            _make_lock_font("Inter", "commercial"),
+        ])
+        save_lock(lock, work_dir / _LOCK_FILE_NAME)
+        installed = [
+            InstalledFont(
+                family="Inter",
+                style="Regular",
+                path=Path("/Library/Fonts/Inter.ttf"),
+                source="local",
+            ),
+        ]
+
+        with patch("src.commands.apply.enumerate_installed_fonts", return_value=installed):
+            result = runner.invoke(app, ["apply", "--json"])
+
+        assert result.exit_code == 0, result.output
+        data = json.loads(result.output)
+        assert len(data["results"]) == 2
+        assert data["summary"]["installed"] == 2
+
 
 # ---------------------------------------------------------------------------
 # エラーケーステスト
@@ -232,6 +280,39 @@ class TestApplyErrorCases:
 
         assert result.exit_code == 0, result.output
         assert "フォントが定義されていません" in result.output
+
+    def test_apply_invalid_lock_json_exits_nonzero(self, work_dir):
+        """lock ファイルが不正 JSON の場合は非 0 で終了すること"""
+        (work_dir / _LOCK_FILE_NAME).write_text("{invalid json", encoding="utf-8")
+
+        result = runner.invoke(app, ["apply"])
+
+        assert result.exit_code != 0
+        assert "Invalid JSON in lock file" in result.output
+
+    def test_apply_invalid_lock_schema_exits_nonzero(self, work_dir):
+        """lock ファイルのスキーマ不正はエラーとして表示されること"""
+        (work_dir / _LOCK_FILE_NAME).write_text(
+            json.dumps({"fontops_version": "1", "project_name": "test"}),
+            encoding="utf-8",
+        )
+
+        result = runner.invoke(app, ["apply"])
+
+        assert result.exit_code != 0
+        assert "FontopsLock requires 'fonts' field" in result.output
+
+    def test_apply_enumeration_permission_error_is_wrapped(self, lock_with_mixed_fonts):
+        """フォント列挙時の PermissionError が CLI エラー表示に変換されること"""
+        with patch(
+            "src.commands.apply.enumerate_installed_fonts",
+            side_effect=PermissionError("denied"),
+        ):
+            result = runner.invoke(app, ["apply"])
+
+        assert result.exit_code != 0
+        assert "権限エラー" in result.output
+        assert "denied" in result.output
 
 
 # ---------------------------------------------------------------------------

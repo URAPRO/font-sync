@@ -163,6 +163,34 @@ class TestJudgeFontStatus:
         result = judge_font_status(lock_font, set())
         assert result.status == FontStatus.UNAVAILABLE
 
+    @pytest.mark.parametrize("source", ["google-fonts", "adobe-fonts", "commercial", "unknown"])
+    def test_judge_font_status_installed_precedence_over_source(self, source):
+        """インストール済みなら source に関係なく INSTALLED が優先されること"""
+        lock_font = LockFont(family="Edge Font", source=source, styles=[])
+        result = judge_font_status(lock_font, {"EDGE FONT"})
+        assert result.status == FontStatus.INSTALLED
+        assert result.action_message == "インストール済み"
+
+    def test_judge_font_status_empty_family_matches_empty_installed_entry(self):
+        """空 family でも installed_families に空文字があれば INSTALLED になること"""
+        lock_font = LockFont(family="", source="local", styles=[])
+        result = judge_font_status(lock_font, {""})
+        assert result.status == FontStatus.INSTALLED
+
+    def test_judgment_result_default_lists_are_not_shared(self):
+        """JudgmentResult のデフォルトリストがインスタンス間で共有されないこと"""
+        font_a = LockFont(family="FontA", source="local", styles=[])
+        font_b = LockFont(family="FontB", source="local", styles=[])
+
+        result_a = JudgmentResult(font=font_a, status=FontStatus.UNAVAILABLE, action_message="a")
+        result_b = JudgmentResult(font=font_b, status=FontStatus.UNAVAILABLE, action_message="b")
+
+        result_a.installed_styles.append("Regular")
+        result_a.missing_styles.append("Bold")
+
+        assert result_b.installed_styles == []
+        assert result_b.missing_styles == []
+
 
 class TestJudgeAll:
     """judge_all 関数のテスト"""
@@ -271,3 +299,44 @@ class TestJudgeAll:
         assert results[0].font.family == "FontA"
         assert results[1].font.family == "FontB"
         assert results[2].font.family == "FontC"
+
+    def test_judge_all_duplicate_lock_families_are_all_judged(self):
+        """lock に同じ family が複数あっても各エントリが保持されること"""
+        lock = FontopsLock(
+            fontops_version="1",
+            project_name="test",
+            fonts=[
+                LockFont(family="Inter", source="google-fonts", styles=[]),
+                LockFont(family="Inter", source="commercial", styles=[]),
+            ],
+        )
+        installed_fonts = [
+            InstalledFont(
+                family="Inter",
+                style="Regular",
+                path=Path("/Library/Fonts/Inter.ttf"),
+                source="local",
+            ),
+        ]
+
+        results = judge_all(lock, installed_fonts)
+
+        assert len(results) == 2
+        assert [r.status for r in results] == [FontStatus.INSTALLED, FontStatus.INSTALLED]
+
+    def test_judge_all_duplicate_installed_fonts_are_deduplicated_by_family(self):
+        """installed_fonts に重複があっても family 単位で INSTALLED 判定できること"""
+        lock = FontopsLock(
+            fontops_version="1",
+            project_name="test",
+            fonts=[LockFont(family="Inter", source="google-fonts", styles=[])],
+        )
+        installed_fonts = [
+            InstalledFont(family="Inter", style="Regular", path=Path("/f/Inter-Regular.ttf"), source="local"),
+            InstalledFont(family="INTER", style="Bold", path=Path("/f/Inter-Bold.ttf"), source="local"),
+        ]
+
+        results = judge_all(lock, installed_fonts)
+
+        assert len(results) == 1
+        assert results[0].status == FontStatus.INSTALLED
