@@ -245,5 +245,11 @@ def handle_errors(func):
     return wrapper
 
 
+# lock サブコマンドを登録（handle_errors 定義後にインポートして循環参照を回避）
+from .commands.lock_cmd import lock_app  # noqa: E402
+
+app.add_typer(lock_app, name="lock", help="fontops.lock の管理")
+
+
 if __name__ == "__main__":
     app()
