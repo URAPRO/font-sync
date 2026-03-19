@@ -251,5 +251,31 @@ from .commands.lock_cmd import lock_app  # noqa: E402
 app.add_typer(lock_app, name="lock", help="fontops.lock の管理")
 
 
+# apply コマンドを登録（handle_errors 定義後にインポートして循環参照を回避）
+from .commands.apply import apply_command as _apply_command  # noqa: E402
+
+
+@app.command("apply", help="fontops.lock に基づいてフォント環境の状態を確認します")
+def apply_cmd(
+    resolve: bool = typer.Option(
+        False,
+        "--resolve",
+        help="不足フォントを自動解決する（未実装、m5-f3 で実装予定）",
+    ),
+    dry_run: bool = typer.Option(
+        False,
+        "--dry-run",
+        help="実行内容を確認のみ（--resolve と組み合わせて使用）",
+    ),
+    json_output: bool = typer.Option(
+        False,
+        "--json",
+        help="JSON 形式で出力",
+    ),
+) -> None:
+    """fontops.lock に基づいてフォント環境の状態を確認します。"""
+    _apply_command(resolve=resolve, dry_run=dry_run, json_output=json_output)
+
+
 if __name__ == "__main__":
     app()
