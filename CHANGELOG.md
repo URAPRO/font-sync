@@ -17,10 +17,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - 詳細なドキュメントとクイックスタートガイド
 
 ### Changed
-- N/A
+- Python 3.8 以降の対応方針と、CI の検証対象（3.8〜3.12）を英日 README に明記。
 
 ### Fixed
-- N/A
+- テスト用ヘルパーの型注釈を既存の `typing.List` / `Optional` に揃え、Python 3.8 / 3.9 でテストを読み込めない問題を修正。
 
 ## [1.0.0] - 2024-XX-XX
 

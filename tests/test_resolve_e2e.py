@@ -14,6 +14,7 @@ import hashlib
 import json
 import zipfile
 from io import BytesIO
+from typing import Optional
 from unittest.mock import patch
 
 import httpx
@@ -62,7 +63,7 @@ def make_error_http_client() -> httpx.Client:
     return httpx.Client(transport=httpx.MockTransport(handler))
 
 
-def make_google_fonts_lock(family: str = "Noto Sans JP", hash_: str | None = None) -> FontopsLock:
+def make_google_fonts_lock(family: str = "Noto Sans JP", hash_: Optional[str] = None) -> FontopsLock:
     """google-fonts ソースの FontopsLock を生成するヘルパー"""
     return FontopsLock(
         fontops_version="1",

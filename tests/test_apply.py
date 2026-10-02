@@ -7,6 +7,7 @@ enumerate_installed_fonts をモックして各シナリオを検証する。
 
 import json
 from pathlib import Path
+from typing import List, Optional
 from unittest.mock import patch
 
 import pytest
@@ -40,7 +41,7 @@ _MOCK_FONTS_INSTALLED = [
 _LOCK_FILE_NAME = "fontops.lock"
 
 
-def _make_lock(fonts: list[LockFont], project_name: str = "test-project") -> FontopsLock:
+def _make_lock(fonts: List[LockFont], project_name: str = "test-project") -> FontopsLock:
     """テスト用 FontopsLock を生成するヘルパー"""
     return FontopsLock(fontops_version="1", project_name=project_name, fonts=fonts)
 
@@ -48,7 +49,7 @@ def _make_lock(fonts: list[LockFont], project_name: str = "test-project") -> Fon
 def _make_lock_font(
     family: str,
     source: str = "local",
-    styles: list[str] | None = None,
+    styles: Optional[List[str]] = None,
 ) -> LockFont:
     """テスト用 LockFont を生成するヘルパー"""
     style_objs = [LockStyle(name=s) for s in (styles or [])]
