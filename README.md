@@ -34,6 +34,9 @@ font-sync sync
 
 ## Installation
 
+Requires Python 3.8 or later. CI tests Python 3.8, 3.9, 3.10, 3.11, and 3.12 on macOS.
+Newer Python versions are not yet covered by CI.
+
 ### Via pip (Recommended)
 
 ```bash

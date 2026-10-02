@@ -7,6 +7,7 @@ AdobeFontsHandler, CommercialHandler, UnavailableHandler, resolve_fonts() の全
 import hashlib
 import zipfile
 from io import BytesIO
+from typing import Optional
 
 import httpx
 
@@ -29,7 +30,7 @@ from src.resolver import (
 def create_test_zip(
     font_filename: str = "TestFont-Regular.ttf",
     font_content: bytes = b"dummy ttf content",
-    extra_files: dict | None = None,
+    extra_files: Optional[dict] = None,
 ) -> bytes:
     """テスト用の Google Fonts-style ZIP を生成"""
     buf = BytesIO()
@@ -44,7 +45,7 @@ def create_test_zip(
 def make_lock_font(
     family: str = "Noto Sans JP",
     source: str = "google-fonts",
-    hash_: str | None = None,
+    hash_: Optional[str] = None,
 ) -> LockFont:
     return LockFont(family=family, source=source, styles=[], hash=hash_)
 
